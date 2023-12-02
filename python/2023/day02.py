@@ -49,13 +49,12 @@ def part1() -> int:
 
 
 def part2() -> int:
-    with input_path.open() as f:
-        data = f.readlines()
-        red_data = (max(int(match.group("count")) for match in re.finditer(RED_PTRN, line)) for line in data)
-        green_data = (max(int(match.group("count")) for match in re.finditer(GREEN_PTRN, line)) for line in data)
-        blue_data = (max(int(match.group("count")) for match in re.finditer(BLUE_PTRN, line)) for line in data)
+    def max_count(pattern: re.Pattern[str], line: str) -> int:
+        return max(int(match.group("count")) for match in re.finditer(pattern, line))
 
-        return sum(red * green * blue for red, green, blue in zip(red_data, green_data, blue_data, strict=True))
+    with input_path.open() as f:
+        data = ((max_count(RED_PTRN, line), max_count(GREEN_PTRN, line), max_count(BLUE_PTRN, line)) for line in f)
+        return sum(red * green * blue for red, green, blue in data)
 
 
 if __name__ == "__main__":
