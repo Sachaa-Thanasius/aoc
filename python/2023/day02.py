@@ -1,6 +1,7 @@
 import re
 from io import StringIO
 from pathlib import Path
+from typing import Any
 
 from python.utils import catchtime
 
@@ -16,36 +17,30 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
 """
 )
 
-RED_PTRN = re.compile(r"(?P<count>\d+) (?P<color>red)")
-GREEN_PTRN = re.compile(r"(?P<count>\d+) (?P<color>green)")
-BLUE_PTRN = re.compile(r"(?P<count>\d+) (?P<color>blue)")
+COLOUR_PATTERN = re.compile(r"(?P<count>\d+) (?P<colour>red|green|blue)")
+RED_PTRN = re.compile(r"(?P<count>\d+) red")
+GREEN_PTRN = re.compile(r"(?P<count>\d+) green")
+BLUE_PTRN = re.compile(r"(?P<count>\d+) blue")
 
 
 def part1() -> int:
-    with input_path.open() as f:
-        data = (line.partition(":") for line in f)
-        data = [(game.partition(" ")[2], raw) for game, _, raw in data]
-        all_game_nums = {int(game_num) for game_num, _ in data}
-        red_data = (
-            int(game_num)
-            for game_num, raw in data
-            for match in re.finditer(RED_PTRN, raw)
-            if int(match.group("count")) > 12
-        )
-        green_data = (
-            int(game_num)
-            for game_num, raw in data
-            for match in re.finditer(GREEN_PTRN, raw)
-            if int(match.group("count")) > 13
-        )
-        blue_data = (
-            int(game_num)
-            for game_num, raw in data
-            for match in re.finditer(BLUE_PTRN, raw)
-            if int(match.group("count")) > 14
+    def check_valid(count: Any, colour: str) -> bool:  # noqa: ANN401
+        return (
+            (colour == "red" and int(count) <= 12)
+            or (colour == "green" and int(count) <= 13)
+            or (colour == "blue" and int(count) <= 14)
         )
 
-        return sum(all_game_nums.difference(red_data, green_data, blue_data))
+    with input_path.open() as f:
+        data = (line.partition(":") for line in f)
+        data = ((int(game.partition(" ")[2]), raw) for game, _, raw in data)
+        data = (
+            game_num
+            for game_num, raw in data
+            if all(check_valid(**match.groupdict()) for match in re.finditer(COLOUR_PATTERN, raw))
+        )
+
+        return sum(data)
 
 
 def part2() -> int:
@@ -59,8 +54,10 @@ def part2() -> int:
 
 if __name__ == "__main__":
     with catchtime() as ct:
-        print(part1())
-    print(ct.time)
-    with catchtime() as ct:
-        print(part2())
-    print(ct.time)
+        result = part1()
+
+    with catchtime() as ct2:
+        result2 = part2()
+
+    print(result, ct.time)
+    print(result2, ct2.time)

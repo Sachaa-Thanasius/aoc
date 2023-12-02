@@ -1,6 +1,8 @@
 import operator
 from pathlib import Path
 
+from python.utils import catchtime
+
 input_path = Path(__file__).parents[2].joinpath("input/2023/day01.txt")
 
 
@@ -55,5 +57,11 @@ def part2() -> int:
 
 
 if __name__ == "__main__":
-    print(part1())
-    print(part2())
+    with catchtime() as ct:
+        result = part1()
+
+    with catchtime() as ct2:
+        result2 = part2()
+
+    print(result, ct.time)
+    print(result2, ct2.time)
