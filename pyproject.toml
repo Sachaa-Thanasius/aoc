@@ -53,6 +53,7 @@ extend-ignore = [
     "ISC001",  # recommended by ruff when using ruff format
     "Q003",    # recommended by ruff when using ruff format
     "T201",    # Prints are fine for AOC.
+    "ERA001",  # Commented code is fine for AOC.
 ]
 unfixable = [
     "ERA", # I don't want anything erroneously detected deleted by this.
